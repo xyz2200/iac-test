@@ -1,0 +1,29 @@
+# Arquivos de estado do Terraform
+*.tfstate
+*.tfstate.*
+
+# Arquivos de configuração gerados
+*.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Logs e diretórios de backup
+*.log
+terraform.*
+*terraform.tfstate.backup
+
+# Arquivos de plug-ins e diretórios
+.terraform/
+terraform.tfstate.backup
+
+# Arquivos temporários
+*.swp
+*.bak
+*.tmp
+*.DS_Store
+
+# Arquivos de backup de IDEs
+.idea/
+.vscode/
