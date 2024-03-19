@@ -50,12 +50,13 @@ resource "aws_secretsmanager_secret" "db" {
 locals {
   initial = {
     # Inicializa as Keys com valores default
-    username             = "andrauss"
-    password             = "testingPass"
-    engine               = "postgres"
-    host                 = "localhost"
-    port                 = "5432"
-    dbInstanceIdentifier = "test"
+    # Para utilizar nas secrets do k8s devem estar encodados em Base64
+    username             = base64encode("postgres")
+    password             = base64encode("123456")
+    engine               = base64encode("pg")
+    host                 = base64encode("localhost")
+    port                 = base64encode("5433")
+    dbInstanceIdentifier = base64encode("totem")
   }
 }
 

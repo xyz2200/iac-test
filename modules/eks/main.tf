@@ -14,6 +14,9 @@ resource "aws_security_group" "sg" {
   tags = var.tags
 }
 
+################################################################################
+# CLUSTER ROLES
+################################################################################
 
 resource "aws_iam_role" "cluster" {
   name = "totem-role"
@@ -51,6 +54,9 @@ resource "aws_iam_role" "node" {
 POLICY
 }
 
+################################################################################
+# CLUSTER POLICIES
+################################################################################
 
 resource "aws_iam_role_policy_attachment" "cluster-AmazonEKSVPCResourceController" {
   role = aws_iam_role.cluster.name
@@ -63,11 +69,9 @@ resource "aws_iam_role_policy_attachment" "cluster-AmazonEKSClusterPolicy" {
 }
 
 
-resource "aws_cloudwatch_log_group" "log" {
-  name = "/aws/eks-terraform-course/totem/cluster"
-  retention_in_days = 7
-}
-
+################################################################################
+# EKS CLUSTER
+################################################################################
 
 resource "aws_eks_cluster" "cluster" {
   name = "totem-cluster"
@@ -78,12 +82,15 @@ resource "aws_eks_cluster" "cluster" {
       security_group_ids = [aws_security_group.sg.id]
   }
   depends_on = [
-    aws_cloudwatch_log_group.log,
     aws_iam_role_policy_attachment.cluster-AmazonEKSVPCResourceController,
     aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPolicy,
   ]
 }
 
+
+################################################################################
+# NODE POLICIES
+################################################################################
 
 resource "aws_iam_role_policy_attachment" "node-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
@@ -100,12 +107,14 @@ resource "aws_iam_role_policy_attachment" "node-AmazonEC2ContainerRegistryReadOn
   role       = aws_iam_role.node.name
 }
 
-resource "aws_eks_node_group" "node-1" {
+################################################################################
+# EKS NODE
+################################################################################
+resource "aws_eks_node_group" "node-2" {
   cluster_name = aws_eks_cluster.cluster.name
-  node_group_name = "node-1"
+  node_group_name = "node-2"
   node_role_arn = aws_iam_role.node.arn
   subnet_ids = var.subnet_ids
-  instance_types = ["t3.micro"]
   scaling_config {
     desired_size = 1
     max_size = 2
@@ -120,7 +129,10 @@ resource "aws_eks_node_group" "node-1" {
 }
 
 
-// CREATEING A SECRET TO THE GERERATED EKS CLUSTER URL
+################################################################################
+# SECRET TO STORE GERERATED EKS CLUSTER URL
+################################################################################
+
 resource "aws_secretsmanager_secret" "eks" {
   name        = "prod/totem/EKS"
   description = "Armazena a URL do cluster do EKS"
